@@ -61,7 +61,7 @@ public class RegAction implements Action {
         }
 
         var password = tgConfig.getPassword();
-        var person = new PersonDTO(email, password, true, null,
+        var person = new PersonDTO(0, email, password, true, null,
                 Calendar.getInstance());
         Object result;
         try {
