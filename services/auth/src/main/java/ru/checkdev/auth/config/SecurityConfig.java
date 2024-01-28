@@ -40,6 +40,7 @@ public class SecurityConfig {
                 "/template/ping",
                 "/profiles/**",
                 "/swagger-ui/**",
+                "/v2/registration",
                 "/v3/**"
         );
     }

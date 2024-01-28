@@ -89,9 +89,9 @@ class TgAuthCallWebClintTest {
         when(requestBodyUriMock.uri("/person/created")).thenReturn(requestBodyMock);
         when(requestBodyMock.bodyValue(personDto)).thenReturn(requestHeadersMock);
         when(requestHeadersMock.retrieve()).thenReturn(responseMock);
-        when(responseMock.bodyToMono(Object.class)).thenReturn(Mono.just(personDto));
-        Mono<Object> objectMono = tgAuthCallWebClint.doPost("/person/created", personDto);
-        PersonDTO actual = (PersonDTO) objectMono.block();
+        when(responseMock.bodyToMono(PersonDTO.class)).thenReturn(Mono.just(personDto));
+        Mono<PersonDTO> objectMono = tgAuthCallWebClint.doPost("/person/created", personDto);
+        PersonDTO actual = objectMono.block();
         assertThat(actual).isEqualTo(personDto);
     }
 }

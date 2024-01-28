@@ -45,13 +45,13 @@ public class TgAuthCallWebClint {
      * @param personDTO Body PersonDTO.class
      * @return Mono<Person>
      */
-    public Mono<Object> doPost(String url, PersonDTO personDTO) {
+    public Mono<PersonDTO> doPost(String url, PersonDTO personDTO) {
         return webClient
                 .post()
                 .uri(url)
                 .bodyValue(personDTO)
                 .retrieve()
-                .bodyToMono(Object.class)
+                .bodyToMono(PersonDTO.class)
                 .doOnError(err -> log.error("API not found: {}", err.getMessage()));
     }
 

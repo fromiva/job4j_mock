@@ -2,10 +2,13 @@ package ru.checkdev.notification.telegram.action;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.checkdev.notification.domain.PersonDTO;
+import ru.checkdev.notification.domain.UserTelegram;
+import ru.checkdev.notification.service.UserTelegramService;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 
@@ -21,10 +24,10 @@ import java.util.Calendar;
 @AllArgsConstructor
 @Slf4j
 public class RegAction implements Action {
-    private static final String ERROR_OBJECT = "error";
-    private static final String URL_AUTH_REGISTRATION = "/registration";
+    private static final String URL_AUTH_REGISTRATION = "/v2/registration";
     private final TgConfig tgConfig = new TgConfig("tg/", 8);
     private final TgAuthCallWebClint authCallWebClint;
+    private final UserTelegramService userTelegramService;
     private final String urlSiteAuth;
 
     @Override
@@ -63,20 +66,16 @@ public class RegAction implements Action {
         var password = tgConfig.getPassword();
         var person = new PersonDTO(0, email, password, true, null,
                 Calendar.getInstance());
-        Object result;
         try {
-            result = authCallWebClint.doPost(URL_AUTH_REGISTRATION, person).block();
+            PersonDTO result = authCallWebClint.doPost(URL_AUTH_REGISTRATION, person).block();
+            userTelegramService.save(new UserTelegram(result.getId(), message.getChatId()));
+        } catch (WebClientResponseException.Conflict e) {
+            return new SendMessage(chatId,
+                    "Ошибка регистрации. Пользователь с почтой " + email + " уже существует.");
         } catch (Exception e) {
             log.error("WebClient doPost error: {}", e.getMessage());
             text = "Сервис не доступен попробуйте позже" + sl
                    + "/start";
-            return new SendMessage(chatId, text);
-        }
-
-        var mapObject = tgConfig.getObjectToMap(result);
-
-        if (mapObject.containsKey(ERROR_OBJECT)) {
-            text = "Ошибка регистрации: " + mapObject.get(ERROR_OBJECT);
             return new SendMessage(chatId, text);
         }
 

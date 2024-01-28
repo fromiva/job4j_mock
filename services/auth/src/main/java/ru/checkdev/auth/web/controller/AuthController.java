@@ -2,6 +2,7 @@ package ru.checkdev.auth.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.service.PersonService;
@@ -9,6 +10,8 @@ import ru.checkdev.auth.service.PersonService;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.CONFLICT;
 
 /**
  * @author parsentev
@@ -63,6 +66,12 @@ public class AuthController {
                 return String.format("Пользователь с почтой %s уже существует.", profile.getEmail());
             }
         });
+    }
+
+    @PostMapping("/v2/registration")
+    public ResponseEntity<Profile> v2registration(@RequestBody Profile profile) {
+        Optional<Profile> result = this.persons.reg(profile);
+        return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(CONFLICT).build());
     }
 
     @PostMapping("/forgot")
