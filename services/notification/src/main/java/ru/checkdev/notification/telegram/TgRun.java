@@ -11,6 +11,7 @@ import ru.checkdev.notification.service.UserTelegramService;
 import ru.checkdev.notification.telegram.action.Action;
 import ru.checkdev.notification.telegram.action.InfoAction;
 import ru.checkdev.notification.telegram.action.RegAction;
+import ru.checkdev.notification.telegram.action.WhoamiAction;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 
 import java.util.List;
@@ -46,8 +47,9 @@ public class TgRun {
     public void initTg() {
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(List.of(
-                        "/start", "/new")),
-                "/new", new RegAction(tgAuthCallWebClint, userTelegramService, urlSiteAuth)
+                        "/start", "/new", "/check")),
+                "/new", new RegAction(tgAuthCallWebClint, userTelegramService, urlSiteAuth),
+                "/check", new WhoamiAction(tgAuthCallWebClint, userTelegramService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);

@@ -46,7 +46,7 @@ class TgConfigTest {
 
     @Test
     void whenGetObjectToMapThenReturnObjectMap() {
-        var personDto = new PersonDTO(100, "mail", "pass", true, null, Calendar.getInstance());
+        var personDto = new PersonDTO(100, null, "mail", "pass", true, null, Calendar.getInstance());
         var map = tgConfig.getObjectToMap(personDto);
         assertThat(map.get("email")).isEqualTo(personDto.getEmail());
         assertThat(map.get("password")).isEqualTo(personDto.getPassword());
