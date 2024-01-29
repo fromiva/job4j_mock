@@ -1,19 +1,18 @@
 package ru.checkdev.notification.telegram;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import ru.checkdev.notification.service.SubscribeTopicService;
 import ru.checkdev.notification.service.UserTelegramService;
-import ru.checkdev.notification.telegram.action.Action;
-import ru.checkdev.notification.telegram.action.InfoAction;
-import ru.checkdev.notification.telegram.action.PasswordForgetAction;
-import ru.checkdev.notification.telegram.action.RegAction;
-import ru.checkdev.notification.telegram.action.WhoamiAction;
+import ru.checkdev.notification.telegram.action.*;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
+import ru.checkdev.notification.telegram.service.TgDescCallWebClint;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,9 @@ import java.util.Map;
 @Slf4j
 public class TgRun {
     private final TgAuthCallWebClint tgAuthCallWebClint;
+    private final TgDescCallWebClint tgDescCallWebClint;
     private final UserTelegramService userTelegramService;
+    private final SubscribeTopicService subscribeTopicService;
     @Value("${tg.username}")
     private String username;
     @Value("${tg.token}")
@@ -39,19 +40,27 @@ public class TgRun {
     @Value("${server.site.url.login}")
     private String urlSiteAuth;
 
-    public TgRun(TgAuthCallWebClint tgAuthCallWebClint, UserTelegramService userTelegramService) {
+    @Autowired
+    public TgRun(TgAuthCallWebClint tgAuthCallWebClint,
+                 TgDescCallWebClint tgDescCallWebClint,
+                 UserTelegramService userTelegramService,
+                 SubscribeTopicService subscribeTopicService) {
         this.tgAuthCallWebClint = tgAuthCallWebClint;
+        this.tgDescCallWebClint = tgDescCallWebClint;
         this.userTelegramService = userTelegramService;
+        this.subscribeTopicService = subscribeTopicService;
     }
 
     @Bean
     public void initTg() {
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(List.of(
-                        "/start", "/new", "/check", "/forget")),
+                        "/start", "/new", "/check", "/forget", "/subscribe", "/unsubscribe")),
                 "/new", new RegAction(tgAuthCallWebClint, userTelegramService, urlSiteAuth),
                 "/check", new WhoamiAction(tgAuthCallWebClint, userTelegramService),
-                "/forget", new PasswordForgetAction(tgAuthCallWebClint, userTelegramService)
+                "/forget", new PasswordForgetAction(tgAuthCallWebClint, userTelegramService),
+                "/subscribe", new SubscribeAction(tgDescCallWebClint, userTelegramService, subscribeTopicService),
+                "/unsubscribe", new UnsubscribeAction(tgDescCallWebClint, userTelegramService, subscribeTopicService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);
