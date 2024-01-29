@@ -9,6 +9,7 @@ import ru.checkdev.auth.service.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -89,6 +90,17 @@ public class AuthController {
                     return "E-mail не найден.";
                 }
             };
+        }
+    }
+
+    @GetMapping("/v2/forgot/{userId}")
+    public ResponseEntity<Void> v2forgot(@PathVariable int userId) {
+        try {
+            Profile profile = this.persons.findById(userId);
+            this.persons.forgot(profile).orElseThrow(NoSuchElementException::new);
+            return ResponseEntity.ok().build();
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

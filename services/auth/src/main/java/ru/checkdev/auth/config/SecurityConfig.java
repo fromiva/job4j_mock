@@ -41,6 +41,7 @@ public class SecurityConfig {
                 "/profiles/**",
                 "/swagger-ui/**",
                 "/v2/registration",
+                "/v2/forgot/*",
                 "/v3/**"
         );
     }

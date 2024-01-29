@@ -10,6 +10,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.checkdev.notification.service.UserTelegramService;
 import ru.checkdev.notification.telegram.action.Action;
 import ru.checkdev.notification.telegram.action.InfoAction;
+import ru.checkdev.notification.telegram.action.PasswordForgetAction;
 import ru.checkdev.notification.telegram.action.RegAction;
 import ru.checkdev.notification.telegram.action.WhoamiAction;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
@@ -47,9 +48,10 @@ public class TgRun {
     public void initTg() {
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(List.of(
-                        "/start", "/new", "/check")),
+                        "/start", "/new", "/check", "/forget")),
                 "/new", new RegAction(tgAuthCallWebClint, userTelegramService, urlSiteAuth),
-                "/check", new WhoamiAction(tgAuthCallWebClint, userTelegramService)
+                "/check", new WhoamiAction(tgAuthCallWebClint, userTelegramService),
+                "/forget", new PasswordForgetAction(tgAuthCallWebClint, userTelegramService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);
