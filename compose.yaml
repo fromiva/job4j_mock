@@ -17,7 +17,9 @@ services:
           nocopy: true
     restart: always
   mock-auth:
-    build: ./services/auth
+    build:
+      context: ./services/auth
+      target: prod
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-auth-db:5432/cd_auth
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -45,7 +47,9 @@ services:
           nocopy: true
     restart: always
   mock-desc:
-    build: ./services/desc
+    build:
+      context: ./services/desc
+      target: prod
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-desc-db:5432/cd_desc
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -73,7 +77,9 @@ services:
           nocopy: true
     restart: always
   mock-mock:
-    build: ./services/mock
+    build:
+      context: ./services/mock
+      target: prod
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-mock-db:5432/cd_mock
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -101,7 +107,9 @@ services:
           nocopy: true
     restart: always
   mock-notification:
-    build: ./services/notification
+    build:
+      context: ./services/notification
+      target: prod
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-notification-db:5432/cd_notification
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -116,7 +124,9 @@ services:
       - mock-notification-db
 
   mock-site:
-    build: ./services/site
+    build:
+      context: ./services/site
+      target: prod
     environment:
       - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://mock-auth/user
       - SECURITY_OAUTH2_TOKENURI=http://mock-auth/oauth/token
