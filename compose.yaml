@@ -1,0 +1,139 @@
+version: "3.9"
+services:
+
+  mock-auth-db:
+    image: postgres:15-alpine
+    container_name: job4j-mock-auth-db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_auth
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: job4j-vol-mock-auth-db
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+    restart: always
+  mock-auth:
+    build: ./services/auth
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-auth-db:5432/cd_auth
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=http://mock-notification:9920
+    container_name: mock-auth
+    ports:
+      - "9900:9900"
+    depends_on:
+      - mock-auth-db
+
+  mock-desc-db:
+    image: postgres:15-alpine
+    container_name: job4j-mock-desc-db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_desc
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: job4j-vol-mock-desc-db
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+    restart: always
+  mock-desc:
+    build: ./services/desc
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-desc-db:5432/cd_desc
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=http://mock-notification:9920
+    container_name: mock-desc
+    ports:
+      - "9902:9902"
+    depends_on:
+      - mock-desc-db
+
+  mock-mock-db:
+    image: postgres:15-alpine
+    container_name: job4j-mock-mock-db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_mock
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: job4j-vol-mock-mock-db
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+    restart: always
+  mock-mock:
+    build: ./services/mock
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-mock-db:5432/cd_mock
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=http://mock-notification:9920
+    container_name: mock-mock
+    ports:
+      - "9912:9912"
+    depends_on:
+      - mock-mock-db
+
+  mock-notification-db:
+    image: postgres:15-alpine
+    container_name: job4j-mock-notification-db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_notification
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: job4j-vol-mock-notification-db
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+    restart: always
+  mock-notification:
+    build: ./services/notification
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mock-notification-db:5432/cd_notification
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://mock-auth:9900/user
+      - SERVER_AUTH=http://mock-auth:9900
+      - SERVER_SITE_URL_LOGIN=http://mock-site:8080/login
+    container_name: mock-notification
+    ports:
+      - "9920:9920"
+    depends_on:
+      - mock-notification-db
+
+  mock-site:
+    build: ./services/site
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://mock-auth/user
+      - SECURITY_OAUTH2_TOKENURI=http://mock-auth/oauth/token
+      - SERVER_AUTH=http://mock-auth:9900
+      - SERVER_AUTH_PING=http://mock-auth:9900/ping
+      - SERVICE_MOCK=http://mock-mock:9912
+    container_name: mock-site
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mock-auth
+      - mock-desc
+      - mock-mock
+      - mock-notification
+
+volumes:
+  job4j-vol-mock-auth-db:
+  job4j-vol-mock-desc-db:
+  job4j-vol-mock-mock-db:
+  job4j-vol-mock-notification-db:

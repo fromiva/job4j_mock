@@ -13,3 +13,9 @@
 - Mock-тестирование, Spring Test, Mockito
 - Интеграционное тестирование
 - Авторизация и аутентификация
+
+Запуск приложения: через Docker Compose
+
+```shell
+docker-compose build && docker-compose up
+```
