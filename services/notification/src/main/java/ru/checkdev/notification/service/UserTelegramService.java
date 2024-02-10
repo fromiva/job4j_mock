@@ -29,4 +29,8 @@ public class UserTelegramService {
     public void deleteByUserId(@NonNull Integer userId) {
         repository.deleteById(userId);
     }
+
+    public boolean deleteByTelegramChatId(@NonNull Long telegramChatId) {
+        return repository.deleteAllByTelegramChatId(telegramChatId) > 0;
+    }
 }

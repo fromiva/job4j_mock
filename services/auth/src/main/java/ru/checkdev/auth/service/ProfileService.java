@@ -3,6 +3,7 @@ package ru.checkdev.auth.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.dto.ProfileDTO;
 import ru.checkdev.auth.repository.PersonRepository;
 
@@ -31,6 +32,10 @@ public class ProfileService {
      */
     public Optional<ProfileDTO> findProfileByID(int id) {
         return Optional.ofNullable(personRepository.findProfileById(id));
+    }
+
+    public Optional<Profile> findProfileByEmail(String email) {
+        return Optional.ofNullable(personRepository.findByEmail(email));
     }
 
     /**

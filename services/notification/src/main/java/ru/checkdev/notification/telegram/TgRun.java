@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.checkdev.notification.service.SubscribeTopicService;
 import ru.checkdev.notification.service.UserTelegramService;
 import ru.checkdev.notification.telegram.action.*;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
-import ru.checkdev.notification.telegram.service.TgDescCallWebClint;
 
 import java.util.List;
 import java.util.Map;
@@ -30,9 +28,7 @@ import java.util.Map;
 @Slf4j
 public class TgRun {
     private final TgAuthCallWebClint tgAuthCallWebClint;
-    private final TgDescCallWebClint tgDescCallWebClint;
     private final UserTelegramService userTelegramService;
-    private final SubscribeTopicService subscribeTopicService;
     @Value("${tg.username}")
     private String username;
     @Value("${tg.token}")
@@ -42,13 +38,9 @@ public class TgRun {
 
     @Autowired
     public TgRun(TgAuthCallWebClint tgAuthCallWebClint,
-                 TgDescCallWebClint tgDescCallWebClint,
-                 UserTelegramService userTelegramService,
-                 SubscribeTopicService subscribeTopicService) {
+                 UserTelegramService userTelegramService) {
         this.tgAuthCallWebClint = tgAuthCallWebClint;
-        this.tgDescCallWebClint = tgDescCallWebClint;
         this.userTelegramService = userTelegramService;
-        this.subscribeTopicService = subscribeTopicService;
     }
 
     @Bean
@@ -59,8 +51,8 @@ public class TgRun {
                 "/new", new RegAction(tgAuthCallWebClint, userTelegramService, urlSiteAuth),
                 "/check", new WhoamiAction(tgAuthCallWebClint, userTelegramService),
                 "/forget", new PasswordForgetAction(tgAuthCallWebClint, userTelegramService),
-                "/subscribe", new SubscribeAction(tgDescCallWebClint, userTelegramService, subscribeTopicService),
-                "/unsubscribe", new UnsubscribeAction(tgDescCallWebClint, userTelegramService, subscribeTopicService)
+                "/subscribe", new SubscribeAction(tgAuthCallWebClint, userTelegramService),
+                "/unsubscribe", new UnsubscribeAction(userTelegramService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);

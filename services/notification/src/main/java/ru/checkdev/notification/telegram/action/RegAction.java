@@ -67,8 +67,8 @@ public class RegAction implements Action {
         var person = new PersonDTO(0, null, email, password, true, null,
                 Calendar.getInstance());
         try {
-            PersonDTO result = authCallWebClint.doPost(URL_AUTH_REGISTRATION, person).block();
-            userTelegramService.save(new UserTelegram(result.getId(), message.getChatId()));
+            authCallWebClint.doPost(URL_AUTH_REGISTRATION, person)
+                    .subscribe(p -> userTelegramService.save(new UserTelegram(p.getId(), message.getChatId())));
         } catch (WebClientResponseException.Conflict e) {
             return new SendMessage(chatId,
                     "Ошибка регистрации. Пользователь с почтой " + email + " уже существует.");
